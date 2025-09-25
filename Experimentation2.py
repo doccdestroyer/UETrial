@@ -10,7 +10,7 @@
 #9 - explain brave'defualting in a ui pop up
 #10 - add burning ailment to enemies, -2 health at the end of their turn
 
-
+HasGoblinSword = False
 
 
 import random
@@ -18,6 +18,9 @@ import random
 
 from Classes import PartyMember
 from Classes import Enemy
+from Classes import Item
+from Classes import heal_user
+
 
 is_in_combat = True
 Action = 0
@@ -29,6 +32,9 @@ character1.stats["mana"] = 25
 character1.print_stats()
 print("\n")
 
+potion = Item(name = "Health Potion", quantity = 3, effect = heal_user(character1, 20), description= "Heal self for 30 HP")
+super_potion = Item(name = "Super Potion", quantity = 3, effect = heal_user(character1, 30), description= "Heal self for 30 HP")
+#TODO define fire potion and heart carrot
 
 
 
@@ -48,8 +54,8 @@ EnemyName = "undefined"
 
 
 Inventory = {
-    "Health Potion" : 3,
-    "Super Potion": 1,
+    potion.name: potion.quantity,
+    super_potion.name: super_potion.quantity,
     "Fire Potion": 2,
     "Hearty Carrot" : 1,
 }
@@ -86,10 +92,10 @@ def EnemyTurn():
 
 def SortInventory(Inventory):
     InventoryItems = []
-    if Inventory["Health Potion"] > 0:
-       InventoryItems.append(("Health Potion - heals 20 HP - " + str(Inventory["Health Potion"]) + " remaining"))
+    if potion.quantity > 0:
+       InventoryItems.append((f"{potion.name} - {potion.description} - {potion.quantity} remaining"))
     if Inventory["Super Potion"] > 0:
-       InventoryItems.append(("Super Potion - heals 30 HP - " + str(Inventory["Super Potion"]) + " remaining"))
+       InventoryItems.append((f"{super_potion.name} - {super_potion.description} - {super_potion.quantity} remaining"))
     if Inventory["Fire Potion"] > 0:
         InventoryItems.append(("Fire Potion - deals 10 damage, inflicts burn - " + str(Inventory["Fire Potion"]) + " remaining"))
     if Inventory["Hearty Carrot"] > 0:
@@ -140,6 +146,7 @@ while is_in_combat == True:
                     print ("You missed your attack!")
                 else:
                     print (EnemyName, " has lost 5 HP!  has ", EnemyHealth, "remaining.")
+
         elif Action == "2":
             print ("What item would you like to use?")
             InventoryItems = SortInventory(Inventory)
@@ -150,17 +157,18 @@ while is_in_combat == True:
                 print ("Press ", itemID + 1, " to use ",InventoryItems[itemID])
                 itemID += 1
             print ("Press ", itemID + 1, "to go back")
-            Action = int(input())
-            if Action == 1:
+            Action = (input())
+            if Action == "1":
                 if CurrentPlayerHealth == MaxPlayerHealth:
                     print ("You already have full health!")
+                    MainMenu()
                 elif (CurrentPlayerHealth + 20) > MaxPlayerHealth:
+                    potion.use_item()
                     CurrentPlayerHealth = MaxPlayerHealth
-                    Inventory["Health Potion"] -= 1
+                    #Inventory["Health Potion"] -= 1
                     print ("You used a potion and regenerated 20 health! You now have ", CurrentPlayerHealth)
                 else:
-                    CurrentPlayerHealth += 20
-                    Inventory["Health Potion"] -= 1
+                    potion.use_item()
                     print ("You used a potion and regenerated 20 health! You now have ", CurrentPlayerHealth)
 
             elif Action == 2:
@@ -188,9 +196,6 @@ while is_in_combat == True:
                 MainMenu()
 
 
-            
-
-
         elif Action == "3":
             print("GAME OVER")
             quit()
@@ -201,7 +206,7 @@ while is_in_combat == True:
 
 
     #Enemy Turn
-    print (f"\nThe {EnemyName} attacked you for {EnemyPower} damage!")
+    print ("\nThe ", EnemyName, " attacked you for 8 damage!")
     CurrentPlayerHealth = DamageCalc(CurrentPlayerHealth, EnemyPower)
 
     if CurrentPlayerHealth <= 0:
