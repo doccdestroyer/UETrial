@@ -16,10 +16,7 @@ HasGoblinSword = False
 import random
 
 
-from Classes import PartyMember
-from Classes import Enemy
-from Classes import Item
-from Classes import heal_user
+from Classes import *
 
 
 is_in_combat = True
@@ -32,44 +29,69 @@ character1.stats["mana"] = 25
 character1.print_stats()
 print("\n")
 
+
+PlayerDamage = 5
+#CurrentPlayerHealth = 100
+#MaxPlayerHealth = 100
+#MaxGoblinHealth = 30
+#MaxDragonHealth = 200
+HasGoblinSword = False
+#EnemyHealth = 100
+#EnemyPower = 99
+#EnemyName = "undefined"
+
+if random.randint(0,2) == 1:
+    #EnemyHealth = MaxGoblinHealth
+    #EnemyName = "Goblin"
+    #EnemyPower = 5
+    current_enemy = Enemy()
+    current_enemy.max_health = 30
+    current_enemy.stats["name"] = "Goblin"
+    current_enemy.stats["health"] = 30
+    current_enemy.stats["strength"] = 8
+else:
+    #EnemyHealth = MaxDragonHealth
+    #EnemyName = "Dragon"
+    #EnemyPower = 10
+    current_enemy = Enemy()
+    current_enemy.max_health = 100
+    current_enemy.stats["name"] = "Dragon"
+    current_enemy.stats["health"] = 100
+    current_enemy.stats["strength"] = 15
+
+
+
 potion = Item(name = "Health Potion", quantity = 3, effect = heal_user(character1, 20), description= "Heal self for 30 HP")
 super_potion = Item(name = "Super Potion", quantity = 3, effect = heal_user(character1, 30), description= "Heal self for 30 HP")
+fire_potion = Item(name= "Fire Potion", quantity = 1, effect = harm_enemy(current_enemy, 20), description= "Deal 20 dmg to the enemy")
 #TODO define fire potion and heart carrot
 
 
 
 
-InventoryItems = ["Standard Health Potion (heal 20 HP)", "Super Health Potion (heal 50 HP)"]
 
-PlayerDamage = 5
-CurrentPlayerHealth = 100
-MaxPlayerHealth = 100
-MaxGoblinHealth = 30
-MaxDragonHealth = 200
-HasGoblinSword = False
-EnemyHealth = 0
-EnemyPower = 99
-EnemyName = "undefined"
-
+InventoryItems = []
 
 
 Inventory = {
     potion.name: potion.quantity,
     super_potion.name: super_potion.quantity,
-    "Fire Potion": 2,
+    fire_potion.name: fire_potion.quantity,
     "Hearty Carrot" : 1,
 }
+
+InventoryTest = {}
     
-def ChooseEnemy():
-    if random.randint(0,2) == 1:
-        EnemyHealth = MaxGoblinHealth
-        EnemyName = "Goblin"
-        EnemyPower = 5
-    else:
-        EnemyHealth = MaxDragonHealth
-        EnemyName = "Dragon"
-        EnemyPower = 10
-    return (EnemyName, EnemyHealth, EnemyPower)
+# def ChooseEnemy():
+#     if random.randint(0,2) == 1:
+#         EnemyHealth = MaxGoblinHealth
+#         EnemyName = "Goblin"
+#         EnemyPower = 5
+#     else:
+#         EnemyHealth = MaxDragonHealth
+#         EnemyName = "Dragon"
+#         EnemyPower = 10
+#     return (EnemyName, EnemyHealth, EnemyPower)
 
 
 def DamageCalc(attacked, attackerStregnth):
@@ -97,7 +119,7 @@ def SortInventory(Inventory):
     if Inventory["Super Potion"] > 0:
        InventoryItems.append((f"{super_potion.name} - {super_potion.description} - {super_potion.quantity} remaining"))
     if Inventory["Fire Potion"] > 0:
-        InventoryItems.append(("Fire Potion - deals 10 damage, inflicts burn - " + str(Inventory["Fire Potion"]) + " remaining"))
+        InventoryItems.append((f"{fire_potion.name} -{fire_potion.description} - {fire_potion.quantity} remaining"))
     if Inventory["Hearty Carrot"] > 0:
         InventoryItems.append(("Hearty Carrot - increase max mana by 5 - "+ str(Inventory["Hearty Carrot"]) + " remaining"))
     return InventoryItems
@@ -106,15 +128,7 @@ def UseItem():
     pass
 
 
-if random.randint(0,2) == 1:
-    EnemyHealth = MaxGoblinHealth
-    EnemyName = "Goblin"
-    EnemyPower = 5
-else:
-    EnemyHealth = MaxDragonHealth
-    EnemyName = "Dragon"
-    EnemyPower = 10
-#return (EnemyName, EnemyHealth, EnemyPower)
+
 
 def MainMenu():
     print("\n\nTurn Number: ", TurnNumber, "\nPress 1 to Attack \nPress 2 to use an item \nPress 3 to exit the game")
@@ -124,20 +138,21 @@ def MainMenu():
 def PlayerAction():
     pass
 
-print ("You have encountered a ", EnemyName, "! \nThe ", EnemyName," has engaged you in combat")
+print ("You have encountered a ", current_enemy.stats['name'], "! \nThe ", current_enemy.stats['name']," has engaged you in combat")
 TurnNumber = 1
-print ("A ",EnemyName, " has attacked you!")
+print ("A ", current_enemy.stats['name'], " has attacked you!")
 while is_in_combat == True:
-    if EnemyHealth > 0:
+    if current_enemy.stats["health"] > 0:
         Action = MainMenu()
         if Action == "1":
-            print ("You attacked the ", EnemyName, "!")
-            EnemyHealth = DamageCalc(EnemyHealth,PlayerDamage)
-            if EnemyHealth <= 0:
-                    print (EnemyName, " has been defeated!")
-                    if EnemyName == "Goblin":
+            print ("You attacked the ", current_enemy.stats["name"], "!")
+            current_enemy.stats["health"] = DamageCalc(current_enemy.stats["health"],current_enemy.stats["strength"])
+            if current_enemy.stats["health"] <= 0:
+                    print (current_enemy.stats["name"], " has been defeated!")
+                    if current_enemy.stats["name"] == "Goblin":
                         HasGoblinSword = True
-                        PlayerDamage = 10
+                        current_enemy.stats["strength"] = 15
+                        print("You have gained the goblin sword! Your attack damage has increased to 10.")
                     is_in_combat = False
                     break
             else:
@@ -145,7 +160,7 @@ while is_in_combat == True:
                 if MissRate > 8:
                     print ("You missed your attack!")
                 else:
-                    print (EnemyName, " has lost 5 HP!  has ", EnemyHealth, "remaining.")
+                    print (current_enemy.stats["name"], " has lost 5 HP!  has ", current_enemy.stats["health"], "remaining.")
 
         elif Action == "2":
             print ("What item would you like to use?")
@@ -159,41 +174,46 @@ while is_in_combat == True:
             print ("Press ", itemID + 1, "to go back")
             Action = (input())
             if Action == "1":
-                if CurrentPlayerHealth == MaxPlayerHealth:
+                if character1.stats["health"] == character1.max_health:
                     print ("You already have full health!")
                     MainMenu()
-                elif (CurrentPlayerHealth + 20) > MaxPlayerHealth:
+                elif (character1.stats["health"] + 20) > character1.max_health:
                     potion.use_item()
-                    CurrentPlayerHealth = MaxPlayerHealth
+                    character1.stats["health"] = character1.max_health
                     #Inventory["Health Potion"] -= 1
-                    print ("You used a potion and regenerated 20 health! You now have ", CurrentPlayerHealth)
+                    print ("You used a potion and regenerated 20 health! You now have ", character1.stats["health"])
                 else:
                     potion.use_item()
-                    print ("You used a potion and regenerated 20 health! You now have ", CurrentPlayerHealth)
+                    print ("You used a potion and regenerated 20 health! You now have ", character1.stats["health"])
 
-            elif Action == 2:
-                if CurrentPlayerHealth == MaxPlayerHealth:
+            elif Action == "2":
+                if character1.stats["health"] == character1.max_health:
                     print ("You already have full health!")
-                elif (CurrentPlayerHealth + 50) > MaxPlayerHealth:
-                    CurrentPlayerHealth = MaxPlayerHealth
+                elif (character1.stats["health"] + 50) > character1.max_health:
+                    character1.stats["health"] = character1.max_health
                     Inventory["Super Potion"] -= 1
-                    print ("You used a super potion and regenerated 50 health! You now have ", CurrentPlayerHealth)
+                    print ("You used a super potion and regenerated 50 health! You now have ", character1.stats['health'])
                 else:
-                    CurrentPlayerHealth += 50
+                    character1.stats["health"] += 50
                     Inventory["Super Potion"] -= 1
-                    print ("You used a super potion and regenerated 50 health! You now have ", CurrentPlayerHealth)
-            elif Action == 3:
-                EnemyHealth = DamageCalc(EnemyHealth,20)
-                Inventory["Fire Potion"] -= 1
+                    print ("You used a super potion and regenerated 50 health! You now have ", character1.stats['health'])
+            elif Action == "3":
+                print ("YOU USED FIRE")
+                breakpoint
+                fire_potion.use_item()
 
-                print (f"You threw a fire potion! Enemy now has {EnemyHealth}")
-            elif Action == 4:
+                print (f"You threw a fire potion! Enemy now has {current_enemy.stats['health']}")
+            elif Action == "4":
                 character1.stats["mana"] += 5
                 character1.max_mana += 5
                 Inventory["Hearty Carrot"] -= 1
-                print(f"You increased your max mana to {character1.max_mana}. You have {character1.stats["mana"]} mana remaining.")
-            elif Action == 5:
+                print(f"You increased your max mana to {character1.max_mana}. You have {character1.stats['mana']} mana remaining.")
+            elif Action == "5":
                 MainMenu()
+            else: 
+                print ("other input detected. try again")
+                MainMenu()
+
 
 
         elif Action == "3":
@@ -206,14 +226,14 @@ while is_in_combat == True:
 
 
     #Enemy Turn
-    print ("\nThe ", EnemyName, " attacked you for 8 damage!")
-    CurrentPlayerHealth = DamageCalc(CurrentPlayerHealth, EnemyPower)
+    print ("\nThe ", current_enemy.stats["name"], " attacked you for 8 damage!")
+    character1.stats["health"] = DamageCalc(character1.stats["health"], current_enemy.stats["strength"])
 
-    if CurrentPlayerHealth <= 0:
+    if character1.stats["health"] <= 0:
         print ("You died!")
         quit()
     else:
-        print ("Player health: ", CurrentPlayerHealth, "/", MaxPlayerHealth)
+        print ("Player health: ", character1.stats["health"], "/", character1.max_health)
 
 
     TurnNumber += 1

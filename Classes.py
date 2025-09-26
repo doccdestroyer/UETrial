@@ -57,7 +57,7 @@ class PartyMember():
 
 class Enemy():
     def __init__(self):
-        self.max_health = 100
+        self.max_health = 30
         
         self.stats = {
             "name": "enemy",
@@ -91,9 +91,10 @@ def heal_user(user, heal_potency):
 def harm_enemy(target, damage):
     def effect():
         target.stats["health"] -= damage
-        print (f"You dealt {damage} damage to the enemy. The enemy has {target.stats["health"]} HP remaining")
+        print (f"You dealt {damage} damage to the enemy. The enemy has {target.stats['health']} HP remaining")
     return effect
 def increase_max_stat():
+    
     pass
 
 class Item():
@@ -123,9 +124,13 @@ print(potion.quantity)
 print (character1.stats["health"])
 
 Goblin = Enemy()
-print (Goblin.stats["health"])
-fire_potion = Item(name = "Fire Potion", quantity = 3, effect = harm_enemy(Goblin, 10), description= "Heal self for 10 HP")
+Goblin.stats["name"] = "Goblin"
+Goblin.stats["health"] = 30
+Goblin.stats["strength"] = 8
+fire_potion = Item(name = "Fire Potion", quantity = 1, effect = harm_enemy(Goblin, 20), description= "Deal 20 dmg to the enemy")
+
 fire_potion.use_item()
+print (Goblin.stats["health"])
 
 
         
