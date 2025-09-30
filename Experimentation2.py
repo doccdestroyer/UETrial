@@ -24,13 +24,23 @@ Action = 0
 
 character1 = PartyMember() 
 character1.set_name("Felix")
+character1.max_health = 100
 character1.stats["health"] = 100
 character1.stats["mana"] = 25
 character1.print_stats()
 print("\n")
 
 
-PlayerDamage = 5
+
+character2 = PartyMember() 
+character2.set_name("Cyrus")
+character2.stats["health"] = 80
+character2.max_health = 80
+character2.stats["mana"] = 40
+character2.print_stats()
+print("\n")
+
+
 #CurrentPlayerHealth = 100
 #MaxPlayerHealth = 100
 #MaxGoblinHealth = 30

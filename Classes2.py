@@ -15,6 +15,7 @@ class PartyMember():
             "mana": 30,
             "exp": 0,
             "level": 0,
+            "max health": 100
         }
         self.inventory = ["health potion","super potion","fire potion", "hearty carrot"]
 
@@ -76,11 +77,6 @@ class Enemy():
 
 
      
-#def heal_user(item):
-        
-    #    print ("player has been healed")
-   #     user = user +  heal_potency
-   #     return effect
 
 def heal_user(user, heal_potency):
     def effect():
@@ -93,9 +89,12 @@ def harm_enemy(target, damage):
         target.stats["health"] -= damage
         print (f"You dealt {damage} damage to the enemy. The enemy has {target.stats['health']} HP remaining")
     return effect
-def increase_max_stat():
-    
-    pass
+
+def increase_max_stat(target, increase):
+    def effect():
+        target.max_health += increase
+        print (f"you increased your Max HP by {increase}! It is now {target.max_health}")
+    return effect
 
 class Item():
     def __init__(self, name, quantity, effect, description):
